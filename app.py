@@ -247,8 +247,48 @@ def admin():
     pending = conn.execute("SELECT COUNT(*) AS c FROM orders WHERE order_status='Pending'").fetchone()["c"]
     conn.close()
     return render_template("admin.html", orders=orders, total=total, pending=pending)
+@app.route("/reports")
+def reports():
+    selected_date = request.args.get("date")
 
+    conn = db()
 
+    if not selected_date:
+        selected_date = conn.execute(
+            "SELECT DATE('now', 'localtime') AS d"
+        ).fetchone()["d"]
+
+    report = conn.execute("""
+        SELECT
+            COUNT(*) AS total_orders,
+            COALESCE(SUM(total), 0) AS total_income
+        FROM orders
+        WHERE substr(created_at, 7, 4) || '-' || substr(created_at, 4, 2) || '-' || substr(created_at, 1, 2) = ?
+    """, (selected_date,)).fetchone()
+
+    pending = conn.execute("""
+        SELECT COUNT(*) AS c
+        FROM orders
+        WHERE substr(created_at, 7, 4) || '-' || substr(created_at, 4, 2) || '-' || substr(created_at, 1, 2) = ?
+        AND order_status != 'Completed'
+    """, (selected_date,)).fetchone()["c"]
+
+    orders_list = conn.execute("""
+        SELECT *
+        FROM orders
+        WHERE substr(created_at, 7, 4) || '-' || substr(created_at, 4, 2) || '-' || substr(created_at, 1, 2) = ?
+        ORDER BY id DESC
+    """, (selected_date,)).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "reports.html",
+        today=report,
+        pending=pending,
+        selected_date=selected_date,
+        orders=orders_list
+    )
 @app.route("/order/<int:order_id>")
 def order_detail(order_id):
     conn = db()
