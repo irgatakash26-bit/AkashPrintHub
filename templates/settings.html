@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<section class="card form-card"><h1>Rate Settings</h1><form method="post">{% for k,s in services.items() %}<label>{{s.name}}</label><input type="number" name="rate_{{k}}" value="{{s.rate}}" min="1">{% endfor %}<button>Save Rates</button></form></section>{% endblock %}

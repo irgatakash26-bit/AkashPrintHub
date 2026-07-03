@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<section class="card form-card center"><h1>Order Successful ✅</h1><h2>{{order.token}}</h2><p>Total Amount: <b>₹{{order.total}}</b></p><p>Pages: {{order.pages}} | Copies: {{order.copies}}</p><p>Payment: {{order.payment_mode}} / {{order.payment_status}}</p><a class="btn" href="/">New Order</a></section>{% endblock %}

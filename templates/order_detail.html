@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="card wide">
+  <h1>Order {{ order['token'] }}</h1>
+
+  <div class="grid two">
+    <div>
+      <p><b>Name:</b> {{ order['name'] }}</p>
+      <p><b>Mobile:</b> {{ order['mobile'] }}</p>
+      <p><b>Service:</b> {{ order['service'] }}</p>
+      <p><b>Total:</b> ₹{{ order['total'] }}</p>
+    </div>
+
+    <div>
+      <p><b>Payment:</b> {{ order['payment_method'] }} / {{ order['payment_status'] }}</p>
+      <p><b>Status:</b> {{ order['order_status'] }}</p>
+      <p><b>Printer:</b> {{ order['printer'] }}</p>
+      <p><b>Notes:</b> {{ order['notes'] }}</p>
+    </div>
+  </div>
+
+  <h3>Files</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>File</th>
+        <th>Pages</th>
+        <th>Open</th>
+        <th>Print</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for f in files %}
+      <tr>
+        <td>{{ f['original_name'] }}</td>
+        <td>{{ f['pages'] }}</td>
+        <td>
+{{ url_for('uploaded', filename=f['saved_name']) }}            Open
+          </a>
+        </td>
+        <td>
+          <a class="btn" href="{{ url_for('print_order', order_id=order['id']) }}">
+            Print
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <br>
+
+  <a class="btn" href="{{ url_for('mark_paid', order_id=order['id']) }}">Mark Paid</a>
+  <a class="btn" href="{{ url_for('complete', order_id=order['id']) }}">Complete</a>
+  <a class="btn" href="{{ url_for('admin') }}">Back</a>
+</section>
+
+{% endblock %}
