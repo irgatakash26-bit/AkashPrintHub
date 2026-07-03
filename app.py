@@ -1,3 +1,7 @@
+import socket
+import qrcode
+from io import BytesIO
+from flask import send_file
 import os
 import json
 import sqlite3
@@ -229,6 +233,12 @@ def success(order_id):
     return render_template("success.html", order=order, files=files)
 
 
+@app.route("/order-count")
+def order_count():
+    conn = db()
+    count = conn.execute("SELECT COUNT(*) AS c FROM orders WHERE order_status!='Deleted'").fetchone()["c"]
+    conn.close()
+    return {"count": count}
 @app.route("/admin")
 def admin():
     conn = db()
@@ -298,7 +308,31 @@ def settings():
 
     return render_template("settings.html", services=services)
 
+def get_local_ip():
+    try:
+        return socket.gethostbyname(socket.gethostname())
+    except:
+        return "127.0.0.1"
 
+
+@app.route("/qr")
+def qr_page():
+    ip = get_local_ip()
+    upload_url = f"http://{ip}:5000"
+    return render_template("qr.html", upload_url=upload_url)
+
+
+@app.route("/qr-image")
+def qr_image():
+    ip = get_local_ip()
+    upload_url = f"http://{ip}:5000"
+
+    img = qrcode.make(upload_url)
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    return send_file(buffer, mimetype="image/png")
 @app.route("/print/<int:order_id>")
 def print_order(order_id):
     conn = db()

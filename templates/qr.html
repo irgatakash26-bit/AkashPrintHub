@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="card wide" style="text-align:center; max-width:850px;">
+  <h1 style="font-size:36px;">📄 Scan & Upload Your Document</h1>
+
+  <p style="font-size:18px;">
+    Xerox / Print साठी QR Scan करा आणि तुमचे Document Upload करा
+  </p>
+
+  <div style="background:white; display:inline-block; padding:20px; border-radius:20px; margin:20px;">
+    <img src="{{ url_for('qr_image') }}" style="width:340px;height:340px;">
+  </div>
+
+  <h2>Akash Digital PrintHub</h2>
+
+  <p><b>Upload Link:</b></p>
+  <p style="font-size:16px;">{{ upload_url }}</p>
+
+  <p style="margin-top:20px;">
+    1) QR Scan करा<br>
+    2) Name आणि Mobile Number टाका<br>
+    3) PDF / JPG / PNG Upload करा<br>
+    4) Submit करा
+  </p>
+
+  <a class="btn" href="{{ url_for('index') }}">Open Upload Page</a>
+</section>
+
+{% endblock %}
