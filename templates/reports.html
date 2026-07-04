@@ -2,15 +2,15 @@
 
 {% block content %}
 
-<section class="card">
+<section class="card reports-card">
 
     <h1>📊 Daily Report</h1>
     <p>आजच्या दुकानाचा संपूर्ण रिपोर्ट</p>
 
     <form method="GET" action="{{ url_for('reports') }}" style="margin: 15px 0;">
     <label><strong>📅 तारीख निवडा:</strong></label>
-    <input type="date" name="date" value="{{ selected_date }}">
-    <button type="submit" class="btn">Report पाहा</button>
+    <input type="date" name="date" value="{{ selected_date }}" class="report-date-input">
+    <button type="submit" class="btn report-btn">Report पहा</button>
 </form>   
 
     <div class="stats">
@@ -36,13 +36,14 @@
 <h2>📋 Selected Date Orders</h2>
 
 {% if orders %}
-<table border="1" width="100%" cellpadding="10">
+<table class="report-table">
     <tr>
         <th>Order ID</th>
         <th>Customer Name</th>
         <th>Mobile</th>
         <th>Total</th>
         <th>Status</th>
+        <th>Action</th>
     </tr>
 
     {% for order in orders %}
@@ -52,6 +53,9 @@
         <td>{{ order.mobile }}</td>
         <td>₹{{ order.total }}</td>
         <td>{{ order.order_status }}</td>
+        <td>
+    <a class="btn" href="{{ url_for('order_detail', order_id=order.id) }}">View</a>
+</td>
     </tr>
     {% endfor %}
 </table>
