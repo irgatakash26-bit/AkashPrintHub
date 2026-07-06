@@ -40,6 +40,12 @@
 </section>
 <h2>📋 Selected Date Orders</h2>
 
+<div class="report-filters">
+    <a class="btn" href="{{ url_for('reports', date=selected_date) }}">All Orders</a>
+    <a class="btn" href="{{ url_for('reports', date=selected_date, status='pending') }}">Pending Orders</a>
+    <a class="btn" href="{{ url_for('reports', date=selected_date, status='completed') }}">Completed Orders</a>
+</div>
+
 {% if orders %}
 <table class="report-table">
     <tr>

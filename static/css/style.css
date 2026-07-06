@@ -41,4 +41,8 @@
 .report-table td {
     padding: 12px;
     border-bottom: 1px solid #e5e7eb;
+}.report-filters {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
 }

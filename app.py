@@ -250,6 +250,7 @@ def admin():
 @app.route("/reports")
 def reports():
     selected_date = request.args.get("date")
+    selected_status = request.args.get("status", "all")
 
     conn = db()
 
@@ -258,32 +259,40 @@ def reports():
             "SELECT DATE('now', 'localtime') AS d"
         ).fetchone()["d"]
 
-    report = conn.execute("""
-        SELECT
-            COUNT(*) AS total_orders,
-            COALESCE(SUM(total), 0) AS total_income
+    date_expr = "substr(created_at, 7, 4) || '-' || substr(created_at, 4, 2) || '-' || substr(created_at, 1, 2)"
+
+    report = conn.execute(f"""
+        SELECT COUNT(*) AS total_orders,
+               COALESCE(SUM(total), 0) AS total_income
         FROM orders
-        WHERE substr(created_at, 7, 4) || '-' || substr(created_at, 4, 2) || '-' || substr(created_at, 1, 2) = ?
+        WHERE {date_expr} = ?
     """, (selected_date,)).fetchone()
 
-    pending = conn.execute("""
+    pending = conn.execute(f"""
         SELECT COUNT(*) AS c
         FROM orders
-        WHERE substr(created_at, 7, 4) || '-' || substr(created_at, 4, 2) || '-' || substr(created_at, 1, 2) = ?
-        AND order_status != 'Completed'
+        WHERE {date_expr} = ?
+        AND order_status = 'Pending'
     """, (selected_date,)).fetchone()["c"]
 
-    completed = conn.execute("""
+    completed = conn.execute(f"""
         SELECT COUNT(*) AS c
         FROM orders
-        WHERE substr(created_at, 7, 4) || '-' || substr(created_at, 4, 2) || '-' || substr(created_at, 1, 2) = ?
+        WHERE {date_expr} = ?
         AND order_status = 'Completed'
     """, (selected_date,)).fetchone()["c"]
 
-    orders_list = conn.execute("""
+    status_condition = ""
+    if selected_status == "pending":
+        status_condition = "AND order_status = 'Pending'"
+    elif selected_status == "completed":
+        status_condition = "AND order_status = 'Completed'"
+
+    orders_list = conn.execute(f"""
         SELECT *
         FROM orders
-        WHERE substr(created_at, 7, 4) || '-' || substr(created_at, 4, 2) || '-' || substr(created_at, 1, 2) = ?
+        WHERE {date_expr} = ?
+        {status_condition}
         ORDER BY id DESC
     """, (selected_date,)).fetchall()
 
@@ -293,7 +302,9 @@ def reports():
         "reports.html",
         today=report,
         pending=pending,
+        completed=completed,
         selected_date=selected_date,
+        selected_status=selected_status,
         orders=orders_list
     )
 @app.route("/order/<int:order_id>")
