@@ -273,6 +273,13 @@ def reports():
         AND order_status != 'Completed'
     """, (selected_date,)).fetchone()["c"]
 
+    completed = conn.execute("""
+        SELECT COUNT(*) AS c
+        FROM orders
+        WHERE substr(created_at, 7, 4) || '-' || substr(created_at, 4, 2) || '-' || substr(created_at, 1, 2) = ?
+        AND order_status = 'Completed'
+    """, (selected_date,)).fetchone()["c"]
+
     orders_list = conn.execute("""
         SELECT *
         FROM orders
