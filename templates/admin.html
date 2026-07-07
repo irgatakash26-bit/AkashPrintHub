@@ -1,4 +1,11 @@
-{% extends 'base.html' %}{% block content %}<div class="stats"><div class="stat"><h2>{{ orders|length }}</h2><p>Total Orders</p></div><div class="stat"><h2>₹{{ total }}</h2><p>Total Amount</p></div><div class="stat"><h2>{{ pending }}</h2><p>Pending</p></div></div><section class="card wide"><h1>Admin Dashboard</h1><table><thead><tr><th>Token</th><th>Name</th><th>Service</th><th>Pages</th><th>Copies</th><th>Total</th><th>Payment</th><th>Status</th><th>Printer</th><th>Action</th></tr></thead><tbody>{% for o in orders %}<tr class="{{ 'done' if o.order_status=='
+{% extends 'base.html' %}{% block content %}<div class="stats"><div class="stat"><h2>{{ orders|length }}</h2><p>Total Orders</p></div><div class="stat"><h2>₹{{ total }}</h2><p>Total Amount</p></div><div class="stat"><h2>{{ pending }}</h2><p>Pending</p></div></div><section class="card wide"><
+  <div style="margin: 15px 0;">
+    <input type="text" id="customerSearch"
+           placeholder="Customer Name किंवा Mobile Number शोधा..."
+           style="width:100%; padding:12px;">
+</div>
+    h1>Admin Dashboard</h1><table><thead><tr><th>Token</th><th>Name</th><th>Service</th><th>Pages</th><th>Copies</th><th>Total</th><th>Payment</th><th>Status</th><th>Printer</th><th>Action</th></tr></thead><tbody>{% for o in orders %}<tr class="{{ 'done' if o.order_status=='
+
     d' else '' }}"><td>{{o.token}}</td><td>{{o.name}}<br><small>{{o.mobile}}</small></td><td>{{o.service_name}}</td><td>{{o.pages}}</td><td>{{o.copies}}</td><td>₹{{o.total}}</td><td>{{o.payment_mode}}<br><b>{{o.payment_status}}</b></td><td>{{o.order_status}}</td><td><small>{{o.suggested_printer}}</small></td><td><a class="btn" href="/order/{{o.id}}">Open</a><a class="btn" href="/paid/{{o.id}}">Paid</a><a class="btn" href="/complete/{{o.id}}">Complete</a><a class="btn danger" href="/delete/{{o.id}}">Delete</a></td></tr>{% endfor %}</tbody></table></section>
     <audio id="newOrderSound" preload="auto">
     <source src="{{ url_for('static', filename='sounds/new-order.mp3') }}" type="audio/mpeg">
@@ -6,6 +13,12 @@
 <div style="margin:15px 0;">
   <button class="btn" type="button" onclick="enableSound()">🔔 Enable Sound</button>
 </div>  
+
+<div style="margin: 15px 0;">
+    <input type="text" id="customerSearch"
+           placeholder="Customer Name किंवा Mobile Number शोधा..."
+           style="width:100%; padding:12px;">
+</div>
 <script>
 let lastOrderCount = null;
 let soundEnabled = false;
@@ -55,5 +68,16 @@ async function checkNewOrders() {
 setInterval(checkNewOrders, 5000);
 checkNewOrders();
 </script>
+</script>
+<script>
+document.getElementById("customerSearch").addEventListener("input", function () {
+    let search = this.value.toLowerCase();
+    let rows = document.querySelectorAll("table tbody tr");
+
+    rows.forEach(function (row) {
+        let text = row.innerText.toLowerCase();
+        row.style.display = text.includes(search) ? "" : "none";
+    });
+});
 </script>
 {% endblock %}
