@@ -4,6 +4,11 @@
            placeholder="Customer Name किंवा Mobile Number शोधा..."
            style="width:100%; padding:12px;">
 </div>
+<div style="margin: 10px 0 15px 0;">
+    <button type="button" class="btn filter-btn" onclick="filterOrders('all', this)">All Orders</button>
+    <button type="button" class="btn filter-btn" onclick="filterOrders('pending', this)">Pending Orders</button>
+    <button type="button" class="btn filter-btn"" onclick="filterOrders('completed', this)">Completed Orders</button>
+</div>
     h1>Admin Dashboard</h1><table><thead><tr><th>Token</th><th>Name</th><th>Service</th><th>Pages</th><th>Copies</th><th>Total</th><th>Payment</th><th>Status</th><th>Printer</th><th>Action</th></tr></thead><tbody>{% for o in orders %}<tr class="{{ 'done' if o.order_status=='
 
     d' else '' }}"><td>{{o.token}}</td><td>{{o.name}}<br><small>{{o.mobile}}</small></td><td>{{o.service_name}}</td><td>{{o.pages}}</td><td>{{o.copies}}</td><td>₹{{o.total}}</td><td>{{o.payment_mode}}<br><b>{{o.payment_status}}</b></td><td>{{o.order_status}}</td><td><small>{{o.suggested_printer}}</small></td><td><a class="btn" href="/order/{{o.id}}">Open</a><a class="btn" href="/paid/{{o.id}}">Paid</a><a class="btn" href="/complete/{{o.id}}">Complete</a><a class="btn danger" href="/delete/{{o.id}}">Delete</a></td></tr>{% endfor %}</tbody></table></section>
@@ -79,5 +84,25 @@ document.getElementById("customerSearch").addEventListener("input", function () 
         row.style.display = text.includes(search) ? "" : "none";
     });
 });
+function filterOrders(status, clickedButton) {
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.classList.remove("active-filter");
+});
+
+clickedButton.classList.add("active-filter");
+    let rows = document.querySelectorAll("table tbody tr");
+
+    rows.forEach(function (row) {
+        let text = row.innerText.toLowerCase();
+
+        if (status === "all") {
+            row.style.display = "";
+        } else if (status === "pending") {
+            row.style.display = text.includes("pending") ? "" : "none";
+        } else if (status === "completed") {
+            row.style.display = text.includes("completed") ? "" : "none";
+        }
+    });
+}
 </script>
 {% endblock %}
