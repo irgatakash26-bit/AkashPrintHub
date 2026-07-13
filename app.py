@@ -8,7 +8,7 @@ import sqlite3
 from datetime import datetime
 from uuid import uuid4
 
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash, session
 from werkzeug.utils import secure_filename
 from PyPDF2 import PdfReader
 
@@ -25,6 +25,18 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app = Flask(__name__)
 app.secret_key = "change-this-secret"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        password = request.form.get("password")
+
+        if password == "1234":
+            session["admin_logged_in"] = True
+            return redirect(url_for("admin"))
+
+        return render_template("login.html", error="Wrong password")
+
+    return render_template("login.html")
 
 
 DEFAULT_SERVICES = {
@@ -241,6 +253,8 @@ def order_count():
     return {"count": count}
 @app.route("/admin")
 def admin():
+    if not session.get("admin_logged_in"):
+        return redirect(url_for("login"))
     conn = db()
     orders = conn.execute("SELECT * FROM orders ORDER BY id DESC").fetchall()
     total = conn.execute("SELECT COALESCE(SUM(total),0) AS s FROM orders WHERE order_status!='Deleted'").fetchone()["s"]
@@ -249,6 +263,8 @@ def admin():
     return render_template("admin.html", orders=orders, total=total, pending=pending)
 @app.route("/reports")
 def reports():
+    if not session.get("admin_logged_in"):
+        return redirect(url_for("login"))
     selected_date = request.args.get("date")
     selected_status = request.args.get("status", "all")
 
@@ -350,6 +366,8 @@ def delete(order_id):
 
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
+    if not session.get("admin_logged_in"):
+        return redirect(url_for("login"))
     services = get_services()
 
     if request.method == "POST":
