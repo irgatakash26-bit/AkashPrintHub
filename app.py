@@ -37,7 +37,10 @@ def login():
         return render_template("login.html", error="Wrong password")
 
     return render_template("login.html")
-
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
 DEFAULT_SERVICES = {
     "bw_single": {"name": "B/W A4 Single Side", "rate": 5, "printer": "Kyocera FS-1025MFP GX"},
